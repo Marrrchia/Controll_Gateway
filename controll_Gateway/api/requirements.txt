@@ -1,0 +1,11 @@
+django==3.0.4
+
+# https://www.django-rest-framework.org/community/3.11-announcement/#deprecations
+djangorestframework==3.11.0
+kafka-python==2.0.1
+mysqlclient==1.4.6
+requests
+configparser
+uwsgi
+influxdb
+django-apscheduler

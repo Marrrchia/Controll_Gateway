@@ -1,0 +1,65 @@
+version: '2'
+services:
+
+    db:
+      container_name: mysql
+      image: mysql/mysql-server
+      environment:
+        - MYSQL_ROOT_PASSWORD=root
+        - MYSQL_DATABASE=mysql
+        - MYSQL_USER=nadi
+        - MYSQL_PASSWORD=Nida1234;
+      # ports:
+      #   - "5432:5432"
+      #   (HOST:CONTAINER)
+      volumes:
+        - mysql:/var/lib/mysql:rw
+        - ./compose/mysql/conf/my.cnf:/etc/mysql/my.cnf # 挂载配置文件
+        - ./compose/mysql/init:/docker-entrypoint-initdb.d/
+      restart: always
+
+    nginx:
+        container_name: nginx-container
+        build: ./nginx
+        restart: always
+        ports:
+        # - "8080:80"
+        - "80:80"
+        volumes:
+        - api_data:/docker_api
+        - ./log:/var/log/nginx
+        depends_on:
+        - api
+
+    api:
+        container_name: api-container
+        build: ./api
+        restart: always
+        # command: uwsgi  --emperor uwsgi.ini
+        command:  uwsgi --ini uwsgi.ini
+        # ports:
+        # - "8002:8000"
+        volumes:
+        - api_data:/docker_api
+        depends_on:
+        - db
+
+    # auto migrate django
+    # migration:
+    #     build: ./api
+    #     command:
+    #         - /bin/sh
+    #         - -c
+    #         - |
+    #           python manage.py collectstatic --noinput
+    #           python manage.py migrate
+    #           python manage.py makemigrations musics
+    #           python manage.py migrate
+    #     volumes:
+    #     - api_data:/docker_api
+    #     depends_on:
+    #     - db
+
+volumes:
+    api_data:
+    mysql:
